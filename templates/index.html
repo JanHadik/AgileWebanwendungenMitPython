@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Guessing Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Guess the Flag</h1>
+    <img id="flag-image" src="{{ url_for('static', filename=flag['image_url']) }}" alt="Flag" style="width: 256px; height: auto;">
+    <form id="guess-form">
+        <label for="guess">Enter the country:</label>
+        <input type="text" id="guess" name="guess" required>
+        <input type="hidden" id="flag_country" name="flag_country" value="{{ flag['country'] }}">
+        <button type="submit">Guess</button>
+    </form>
+    <p id="result"></p>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#guess-form').submit(function(event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            $.post('/check_guess', formData, function(response) {
+                console.log(response); // Log the response to the console
+                $('#result').text(response.result);
+                if (response.new_flag) {
+                    $('#flag-image').attr('src', response.new_flag.image_url);
+                    $('#flag_country').val(response.new_flag.country);
+                }
+            });
+        });
+    });
+    </script>
+
+</body>
+</html>
