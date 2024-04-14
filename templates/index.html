@@ -3,23 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flag Guessing Game</title>
+    <title>Flagstravaganza</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Style the dropdown list */
+        #guess-dropdown {
+            display: none;
+            position: absolute;
+            background-color: #202020;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+        #guess-dropdown button {
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            border: none;
+            background-color: inherit;
+            cursor: pointer;
+        }
+        #guess-dropdown button:hover {
+            background-color: #ddd;
+        }
+    </style>
 </head>
 <body>
     <h1>Guess the Flag</h1>
     <img id="flag-image" src="{{ url_for('static', filename=flag['image_url']) }}" alt="Flag" style="width: 256px; height: auto;">
     <form id="guess-form">
         <label for="guess">Enter the country:</label>
-        <input type="text" id="guess" name="guess" required>
+        <input type="text" id="guess" name="guess" required autocomplete="off">
         <input type="hidden" id="flag_country" name="flag_country" value="{{ flag['country'] }}">
         <button type="submit">Guess</button>
     </form>
+    <!-- Dropdown list for possible answers -->
+    <div id="guess-dropdown"></div>
     <p id="result"></p>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
     $(document).ready(function() {
+        // Array of possible answers
+        possibleAnswers = ["Andorra", "United Arab Emirates", "Afghanistan", "Antigua and Barbuda", "Anguilla", "Albania", "Armenia", "Angola", "Antarctica", "Argentina", "American Samoa", "Austria", "Australia", "Aruba", "Åland Islands", "Azerbaijan", "Bosnia and Herzegovina", "Barbados", "Bangladesh", "Belgium", "Burkina Faso", "Bulgaria", "Bahrain", "Burundi", "Benin", "Saint Barthélemy", "Bermuda", "Brunei Darussalam", "Bolivia, Plurinational State of", "Bonaire, Sint Eustatius and Saba", "Brazil", "Bahamas", "Bhutan", "Bouvet Island", "Botswana", "Belarus", "Belize", "Canada", "Cocos (Keeling) Islands", "Congo, Democratic Republic of the", "Central African Republic", "Congo", "Switzerland", "Côte d'Ivoire", "Cook Islands", "Chile", "Cameroon", "China", "Colombia", "Costa Rica", "Cuba", "Cape Verde", "Curaçao", "Christmas Island", "Cyprus", "Czechia", "Germany", "Djibouti", "Denmark", "Dominica", "Dominican Republic", "Algeria", "Ecuador", "Estonia", "Egypt", "Western Sahara", "Eritrea", "Spain", "Ethiopia", "Finland", "Fiji", "Falkland Islands (Malvinas)", "Micronesia, Federated States of", "Faroe Islands", "France", "Gabon", "United Kingdom of Great Britain and Northern Ireland", "Northern Ireland", "Scotland", "Wales", "United Kingdom", "Grenada", "Georgia", "French Guiana", "Guernsey", "Ghana", "Gibraltar", "Greenland", "Gambia", "Guinea", "Guadeloupe", "Equatorial Guinea", "Greece", "South Georgia and the South Sandwich Islands", "Guatemala", "Guam", "Guinea-Bissau", "Guyana", "Hong Kong", "Heard Island and McDonald Islands", "Honduras", "Croatia", "Haiti", "Hungary", "Indonesia", "Ireland", "Israel", "Isle of Man", "India", "British Indian Ocean Territory", "Iraq", "Iran, Islamic Republic of", "Iceland", "Italy", "Jersey", "Jamaica", "Jordan", "Japan", "Kenya", "Kyrgyzstan", "Cambodia", "Kiribati", "Comoros", "Saint Kitts and Nevis", "Korea, Democratic People's Republic of", "Korea, Republic of", "Kuwait", "Cayman Islands", "Kazakhstan", "Lao People's Democratic Republic", "Lebanon", "Saint Lucia", "Liechtenstein", "Sri Lanka", "Liberia", "Lesotho", "Lithuania", "Luxembourg", "Latvia", "Libya", "Morocco", "Monaco", "Moldova, Republic of", "Montenegro", "Saint Martin (French part)", "Madagascar", "Marshall Islands", "North Macedonia", "Mali", "Myanmar", "Mongolia", "Macao", "Northern Mariana Islands", "Martinique", "Mauritania", "Montserrat", "Malta", "Mauritius", "Maldives", "Malawi", "Mexico", "Malaysia", "Mozambique", "Namibia", "New Caledonia", "Niger", "Norfolk Island", "Nigeria", "Nicaragua", "Netherlands", "Norway", "Nepal", "Nauru", "Niue", "New Zealand", "Oman", "Panama", "Peru", "French Polynesia", "Papua New Guinea", "Philippines", "Pakistan", "Poland", "Saint Pierre and Miquelon", "Pitcairn", "Puerto Rico", "Palestine, State of", "Portugal", "Palau", "Paraguay", "Qatar", "Réunion", "Romania", "Serbia", "Russian Federation", "Rwanda", "Saudi Arabia", "Solomon Islands", "Seychelles", "Sudan", "Sweden", "Singapore", "Saint Helena, Ascension and Tristan da Cunha", "Slovenia", "Svalbard and Jan Mayen", "Slovakia", "Sierra Leone", "San Marino", "Senegal", "Somalia", "Suriname", "South Sudan", "Sao Tome and Principe", "El Salvador", "Sint Maarten (Dutch part)", "Syrian Arab Republic", "Eswatini", "Turks and Caicos Islands", "Chad", "French Southern Territories", "Togo", "Thailand", "Tajikistan", "Tokelau", "Timor-Leste", "Turkmenistan", "Tunisia", "Tonga", "Turkey", "Trinidad and Tobago", "Tuvalu", "Taiwan, Province of China", "Tanzania, United Republic of", "Ukraine", "Uganda", "United States Minor Outlying Islands", "United States of America", "Uruguay", "Uzbekistan", "Holy See", "Saint Vincent and the Grenadines", "Venezuela, Bolivarian Republic of", "Virgin Islands, British", "Virgin Islands, U.S.", "Viet Nam", "Vanuatu", "Wallis and Futuna", "Samoa", "Yemen", "Mayotte", "South Africa", "Zambia", "Zimbabwe"]
+
+        // Function to display possible answers when input is focused
+        function updateDropdown() {
+        var userInput = $('#guess').val().trim().toLowerCase(); // Get user input and convert to lowercase
+        console.log("User input:", userInput);
+        var dropdown = $('#guess-dropdown');
+        dropdown.empty(); // Clear previous dropdown items
+
+        if (userInput.length > 0) {
+            // Filter possible answers that start with the same letter as user input
+            var filteredAnswers = possibleAnswers.filter(function(answer) {
+                return answer.toLowerCase().startsWith(userInput);
+            });
+            console.log("Filtered answers:", filteredAnswers);
+            // Add each filtered possible answer to the dropdown
+            filteredAnswers.forEach(function(answer) {
+                dropdown.append('<button type="button">' + answer + '</button>');
+            });
+            // Show the dropdown below the input field
+            dropdown.css({
+                top: $('#guess').offset().top + $('#guess').outerHeight(),
+                left: $('#guess').offset().left,
+                width: $('#guess').outerWidth()
+            }).show();
+        } else {
+            dropdown.hide(); // Hide dropdown if input is empty
+        }
+    }
+
+    // Event listener for input focus
+    $('#guess').on('input', function() {
+        console.log("Input event triggered");
+        updateDropdown();
+    });
+
+    // Hide the dropdown when input loses focus
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('#guess-dropdown').length && !$(event.target).is('#guess')) {
+            $('#guess-dropdown').hide();
+            console.log("Dropdown hidden");
+        }
+    });
+
+    // Handle selection of an answer from the dropdown
+    $('#guess-dropdown').on('click', 'button', function() {
+        $('#guess').val($(this).text()); // Set input value to the selected answer
+        $('#guess-dropdown').hide(); // Hide the dropdown
+    });
+
         $('#guess-form').submit(function(event) {
             event.preventDefault();
             var formData = $(this).serialize();
@@ -27,9 +101,10 @@
                 console.log(response); // Log the response to the console
                 $('#result').text(response.result);
                 if (response.new_flag) {
-                    $('#flag-image').attr('src', response.new_flag.image_url);
+                    $('#flag-image').attr('src', '/static/' + response.new_flag.image_url);
                     $('#flag_country').val(response.new_flag.country);
                 }
+                $('#guess').val(''); // Clear the input field
             });
         });
     });
