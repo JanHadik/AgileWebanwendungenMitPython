@@ -1,15 +1,31 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flag_list import FLAGS
 import random
 
 app = Flask(__name__)
 
+users = {'user1': 'password1', 'user2': 'password2'}
+
+
 @app.route('/')
 def index():
-    # Pick a random flag
-    flag = random.choice(FLAGS)
-    return render_template('index.html', flag=flag)
+    return render_template('index.html')
 
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+
+    if username in users and users[username] == password:
+        # Redirect to another HTML page on successful login
+        return redirect(url_for('game'))
+    else:
+        return 'Invalid username or password. Please try again.'
+
+@app.route('/lewin_suckt')
+def game():
+    flag = random.choice(FLAGS)
+    return render_template('game.html', flag=flag)
 
 @app.route('/check_guess', methods=['POST'])
 def check_guess():
@@ -31,4 +47,4 @@ def check_guess():
 
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=80)
