@@ -204,7 +204,7 @@ FLAGS = [
     {"country": "South Sudan", "image_url": "212.png"},
     {"country": "Sao Tome and Principe", "image_url": "213.png"},
     {"country": "El Salvador", "image_url": "214.png"},
-    {"country": "Sint Maarten "image_url": "215.png"},
+    {"country": "Sint Maarten", "image_url": "215.png"},
     {"country": "Syria", "image_url": "216.png"},
     {"country": "Eswatini", "image_url": "217.png"},
     {"country": "Turks and Caicos Islands", "image_url": "218.png"},

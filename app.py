@@ -4,7 +4,7 @@ import random
 
 app = Flask(__name__)
 
-users = {'user1': 'password1', 'user2': 'password2'}
+users = {'1': '1', 'user2': 'password2'}
 
 
 @app.route('/')
@@ -22,7 +22,7 @@ def login():
     else:
         return 'Invalid username or password. Please try again.'
 
-@app.route('/lewin_suckt')
+@app.route('/game')
 def game():
     flag = random.choice(FLAGS)
     return render_template('game.html', flag=flag)
@@ -47,4 +47,4 @@ def check_guess():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=5000)
