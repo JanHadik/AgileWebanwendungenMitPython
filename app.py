@@ -6,6 +6,8 @@ app = Flask(__name__)
 
 users = {'1': '1', 'user2': 'password2'}
 
+# Extract country names from FLAGS list
+countries = [flag['country'] for flag in FLAGS]
 
 @app.route('/')
 def index():
@@ -25,7 +27,7 @@ def login():
 @app.route('/game')
 def game():
     flag = random.choice(FLAGS)
-    return render_template('game.html', flag=flag)
+    return render_template('game.html', flag=flag, countries=countries)
 
 @app.route('/check_guess', methods=['POST'])
 def check_guess():

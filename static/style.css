@@ -57,12 +57,18 @@ p#result {
     font-weight: bold;
 }
 
+.input-container {
+    position: relative;
+}
+
 #guess-dropdown {
-    display: none;
     position: absolute;
-    background-color: #202020;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    z-index: 1;
+    top: 100%; /* Position below the input field */
+    left: 0;
+    display: none; /* Initially hidden */
+    width: 100%; /* Same width as the input field */
+    box-sizing: border-box;
+    z-index: 1; /* Ensure it appears above other elements */
 }
 #guess-dropdown button {
     width: 100%;
