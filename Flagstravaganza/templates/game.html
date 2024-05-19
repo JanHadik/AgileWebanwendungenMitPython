@@ -38,7 +38,7 @@
         if (userInput.length > 0) {
             // Filter possible answers that start with the same letter as user input
             var filteredAnswers = possibleAnswers.filter(function(answer) {
-                return answer.toLowerCase().startsWith(userInput);
+                return answer.toLowerCase().includes(userInput)
             });
             // Add each filtered possible answer to the dropdown
             filteredAnswers.forEach(function(answer) {

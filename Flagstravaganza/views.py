@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
-from flag_list import FLAGS
 import random
 
-app = Flask(__name__)
+from flask import render_template, request, jsonify, redirect, url_for
+from instance.flag_list import FLAGS
+from Flagstravaganza import app, db
+from Flagstravaganza.models import User
 
-users = {'1': '1', 'user2': 'password2'}
+
 
 # Extract country names from FLAGS list
 countries = [flag['country'] for flag in FLAGS]
@@ -18,7 +19,8 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    if username in users and users[username] == password:
+    user = User.query.filter_by(username=username, password=password).first()
+    if user:
         # Redirect to another HTML page on successful login
         return redirect(url_for('game'))
     else:
@@ -46,7 +48,3 @@ def check_guess():
     else:
         result = "Incorrect! Try again."
         return jsonify(result=result)
-
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
