@@ -9,7 +9,9 @@ from config import salt
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if session.get("logged_in") is None:
+        session["logged_in"] = False
+    return render_game()
 
 
 @app.route('/login', methods=['POST'])
@@ -31,13 +33,6 @@ def login():
 @app.route('/logout', methods=['POST'])
 def logout():
     session["logged_in"] = False
-    return render_game()
-
-
-@app.route('/game')
-def game():
-    if session.get("logged_in") is None:
-        session["logged_in"] = False
     return render_game()
 
 
