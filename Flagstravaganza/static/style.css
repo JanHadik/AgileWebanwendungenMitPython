@@ -61,9 +61,10 @@ p#result {
     display: none;
     position: absolute;
     background-color: #202020;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1;
 }
+
 #guess-dropdown button {
     width: 100%;
     text-align: left;
@@ -72,6 +73,38 @@ p#result {
     background-color: inherit;
     cursor: pointer;
 }
+
 #guess-dropdown button:hover {
     background-color: #ddd;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px;
+    color: white;
+}
+
+.navbar .left, .navbar .right {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+}
+
+.navbar input[type="text"], .navbar input[type="password"] {
+    margin: 0 5px;
+    padding: 5px;
+}
+
+.navbar button {
+    margin-left: 10px;
+    padding: 5px 10px;
+}
+
+.navbar a {
+    color: white;
+    margin-left: 10px;
+    text-decoration: none;
 }
