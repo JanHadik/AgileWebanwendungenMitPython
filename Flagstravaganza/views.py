@@ -3,8 +3,10 @@ import random
 import time
 
 from flask import render_template, request, jsonify, session
+from sqlalchemy import desc
+
 from Flagstravaganza import app, db
-from Flagstravaganza.models import User, Flag
+from Flagstravaganza.models import User, Flag, Highscore
 from config import salt
 
 
@@ -12,6 +14,13 @@ from config import salt
 def index():
     if session.get("logged_in") is None:
         session["logged_in"] = False
+    session["score"] = 0
+    highest_scores = Highscore.query.order_by(Highscore.score.desc()).limit(5).all()
+    user_highscore = None
+    if session["logged_in"]:
+        user = User.query.filter_by(username=session["username"]).first()
+        if user:
+            user_highscore = Highscore.query.filter_by(user=user).first()
     return render_game()
 
 
@@ -57,6 +66,7 @@ def login():
     if user:
         # Redirect to another HTML page on successful login
         session["logged_in"] = True
+        session["username"] = username
         return render_game()
     else:
         return render_game()
@@ -83,8 +93,21 @@ def check_guess():
         new_flag = random.choice(flags)
         new_flag_data = {"img_path": new_flag.img_path, "country": new_flag.country}
         result = "Correct! Here's a new flag."
+        session["score"] = session["score"] + 1
         return jsonify(result=result, new_flag=new_flag_data)
     else:
+        if session["logged_in"]:
+            curr_highscore = Highscore.query.filter_by(user=session["username"]).first()
+            if curr_highscore is None:
+                highscore = Highscore(session["username"], session["score"])
+                db.session.add(highscore)
+                db.session.commit()
+            elif curr_highscore.score < session["score"]:
+                db.session.query(Highscore).filter_by(user=session["username"]).delete()
+                highscore = Highscore(session["username"], session["score"])
+                db.session.add(highscore)
+                db.session.commit()
+            session["score"] = 0
         result = "Incorrect! Try again."
         return jsonify(result=result)
 
@@ -96,7 +119,18 @@ def render_game():
     flag = random.choice(flags)
     flag_data = {"img_path": flag.img_path, "country": flag.country}
 
-    return render_template('game.html', flag=flag_data, countries=countries, logged_in=session["logged_in"])
+    # Retrieve highest 5 high scores
+    highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(5).all()
+
+    # Retrieve user's high score if logged in
+    user_highscore = None
+    if session["logged_in"]:
+        user = User.query.filter_by(username=session["username"]).first()
+        if user:
+            user_highscore = Highscore.query.filter_by(user=user.id).first()
+
+    return render_template('game.html', flag=flag_data, countries=countries, logged_in=session["logged_in"],
+                           highest_scores=highest_scores, user_highscore=user_highscore)
 
 
 if __name__ == '__main__':

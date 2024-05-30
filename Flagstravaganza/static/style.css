@@ -134,3 +134,13 @@ p#result {
     background-color: #404040;
     text-align: center;
 }
+
+.left-column {
+    width: 10%;
+    float: left;
+}
+
+.right-column {
+    width: 90%;
+    float: left;
+}

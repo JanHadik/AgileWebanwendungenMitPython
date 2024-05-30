@@ -8,41 +8,57 @@
 </head>
 <body>
 <div class="navbar">
-    <div class="left">
-        <span>Flagstravaganza</span>
-    </div>
-    {% if logged_in == false %}
-        <div class="right">
-            <form action="/login" method="POST">
-                <input type="text" id="username" name="username" placeholder="Username" required>
-                <input type="password" id="password" name="password" placeholder="Password" required>
-                <button id="login-button">Login</button>
-            </form>
-            <form action="/register_page" method="POST">
-                <button id="register-button">Register</button>
-            </form>
-        </div>
-    {% endif %}
-    {% if logged_in == true %}
-        <div class="right">
-            <form action="/logout" method="POST">
-                <button id="logout-button">Logout</button>
-            </form>
-        </div>
+    <span>Flagstravaganza</span>
+    {% if logged_in %}
+        <form action="/logout" method="POST">
+            <button id="logout-button">Logout</button>
+        </form>
+    {% else %}
+        <form action="/login" method="POST">
+            <input type="text" id="username" name="username" placeholder="Username" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <button id="login-button">Login</button>
+        </form>
+        <form action="/register_page" method="POST">
+            <button id="register-button">Register</button>
+        </form>
     {% endif %}
 </div>
-<h1>Guess the Flag</h1>
-<img id="flag-image" src="{{ url_for('static', filename=flag['img_path']) }}" alt="Flag"
-     style="width: 256px; height: auto;">
-<form id="guess-form">
-    <label for="guess">Enter the country:</label>
-    <input type="text" id="guess" name="guess" required autocomplete="off">
-    <input type="hidden" id="flag_country" name="flag_country" value="{{ flag['country'] }}">
-    <button type="submit">Guess</button>
-</form>
-<!-- Dropdown list for possible answers -->
-<div id="guess-dropdown"></div>
-<p id="result"></p>
+
+<div class="content">
+    <div class="left-column">
+        <div class="high-scores">
+            <h2>High Scores</h2>
+            <ol>
+                {% for score in highest_scores %}
+                    <li>{{ score.user.username }}: {{ score.score }}</li>
+                {% endfor %}
+            </ol>
+            <h2>Your High Score:</h2>
+                {% if user_highscore %}
+                    <p>{{ user_highscore.score }}</p>
+                {% else %}
+                    <p>No high score yet</p>
+                {% endif %}
+        </div>
+    </div>
+    <div class="right-column">
+        <div class="flag-guess">
+            <h1>Guess the Flag</h1>
+            <img id="flag-image" src="{{ url_for('static', filename=flag['img_path']) }}" alt="Flag"
+                 style="width: 256px; height: auto;">
+            <form id="guess-form">
+                <label for="guess">Enter the country:</label>
+                <input type="text" id="guess" name="guess" required autocomplete="off">
+                <input type="hidden" id="flag_country" name="flag_country" value="{{ flag['country'] }}">
+                <button type="submit">Guess</button>
+            </form>
+            <!-- Dropdown list for possible answers -->
+            <div id="guess-dropdown"></div>
+            <p id="result"></p>
+        </div>
+    </div>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
