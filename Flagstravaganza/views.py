@@ -1,7 +1,8 @@
 import hashlib
 import random
+import time
 
-from flask import render_template, request, jsonify, redirect, url_for, session
+from flask import render_template, request, jsonify, session
 from Flagstravaganza import app, db
 from Flagstravaganza.models import User, Flag
 from config import salt
@@ -12,6 +13,37 @@ def index():
     if session.get("logged_in") is None:
         session["logged_in"] = False
     return render_game()
+
+
+@app.route('/register_page', methods=['POST'])
+def register_page():
+    return render_template('register_form.html')
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form['username']
+    password = request.form['password']
+    confirmed_password = request.form['confirm_password']
+
+    user = User.query.filter_by(username=username).first()
+
+    if password != confirmed_password:
+        result = "Passwords do not match"
+        return render_template('register_form.html', error=result)
+    elif user:
+        result = "Username already exists"
+        return render_template('register_form.html', error=result)
+    else:
+        hashed_password = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+
+        user = User(username, hashed_password)
+        db.session.add(user)
+        db.session.commit()
+
+        time.sleep(2.5)
+
+        return render_game()
 
 
 @app.route('/login', methods=['POST'])

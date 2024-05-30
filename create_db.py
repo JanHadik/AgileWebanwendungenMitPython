@@ -12,7 +12,7 @@ with app.app_context():
         db.session.query(models.Flag).delete()
     db.session.commit()
 
-    user = models.User("Test", hashlib.pbkdf2_hmac('sha256', "Test".encode('utf-8'), salt, 100000))
+    user = models.User("Admin", hashlib.pbkdf2_hmac('sha256', "Adminpassword".encode('utf-8'), salt, 100000))
     db.session.add(user)
     db.session.commit()
 
