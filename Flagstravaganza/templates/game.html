@@ -31,15 +31,17 @@
             <h2>High Scores</h2>
             <ol>
                 {% for score in highest_scores %}
-                    <li>{{ score.user.username }}: {{ score.score }}</li>
+                    <li>{{ score.user }}: {{ score.score }}</li>
                 {% endfor %}
             </ol>
-            <h2>Your High Score:</h2>
+            {% if logged_in %}
+                <h2>Your High Score:</h2>
                 {% if user_highscore %}
                     <p>{{ user_highscore.score }}</p>
                 {% else %}
                     <p>No high score yet</p>
                 {% endif %}
+            {% endif %}
         </div>
     </div>
     <div class="right-column">

@@ -9,18 +9,20 @@ from Flagstravaganza import app, db
 from Flagstravaganza.models import User, Flag, Highscore
 from config import salt
 
+'''
+Session Variables:
+
+session["score"]
+session["username"]
+session["logged_in"]
+
+session["image"]
+'''
+
 
 @app.route('/')
 def index():
-    if session.get("logged_in") is None:
-        session["logged_in"] = False
-    session["score"] = 0
-    highest_scores = Highscore.query.order_by(Highscore.score.desc()).limit(5).all()
-    user_highscore = None
-    if session["logged_in"]:
-        user = User.query.filter_by(username=session["username"]).first()
-        if user:
-            user_highscore = Highscore.query.filter_by(user=user).first()
+    set_session_variables()
     return render_game()
 
 
@@ -64,7 +66,6 @@ def login():
 
     user = User.query.filter_by(username=username, password=hashed_password).first()
     if user:
-        # Redirect to another HTML page on successful login
         session["logged_in"] = True
         session["username"] = username
         return render_game()
@@ -112,6 +113,15 @@ def check_guess():
         return jsonify(result=result)
 
 
+def set_session_variables():
+    # sets the session variables to a default value
+    session["logged_in"] = False
+    session["score"] = 0
+    session["username"] = ""
+
+    return
+
+
 def render_game():
     # Retrieve all flags and countries from the database
     flags = Flag.query.all()
@@ -127,10 +137,10 @@ def render_game():
     if session["logged_in"]:
         user = User.query.filter_by(username=session["username"]).first()
         if user:
-            user_highscore = Highscore.query.filter_by(user=user.id).first()
+            user_highscore = Highscore.query.filter_by(user=user.username).first()
 
     return render_template('game.html', flag=flag_data, countries=countries, logged_in=session["logged_in"],
-                           highest_scores=highest_scores, user_highscore=user_highscore)
+                           highest_scores=highest_scores, user_highscore=user_highscore, username=session["username"])
 
 
 if __name__ == '__main__':

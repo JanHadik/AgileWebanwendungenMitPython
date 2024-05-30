@@ -144,3 +144,7 @@ p#result {
     width: 90%;
     float: left;
 }
+
+.high-scores {
+    padding-left: 30px;
+}
