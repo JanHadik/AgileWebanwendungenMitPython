@@ -1,0 +1,238 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #404040;
+    color: white;
+    font-size: 16px;
+}
+
+/* Navbar styles */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    padding: 10px;
+    color: white;
+}
+
+.navbar .left, .navbar .right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar span {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.navbar input[type="text"], .navbar input[type="password"] {
+    margin: 0 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.navbar button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.navbar button:hover {
+    background-color: #0056b3;
+}
+
+.navbar a {
+    color: white;
+    margin-left: 10px;
+    text-decoration: none;
+}
+
+/* Center container for content */
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+/* Form container */
+.form-container {
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #404040;
+    text-align: center;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Content styles */
+.content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.left-column, .right-column {
+    width: 100%;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.high-scores, .flag-guess {
+    background-color: #505050;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+h1, h2 {
+    font-size: 1.5em;
+    margin: 0 0 10px 0;
+}
+
+ol {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+/* Flag image */
+#flag-image {
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #333;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 256px;
+}
+
+/* Guess form */
+#guess-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#guess {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: calc(50% - 22px);
+}
+
+button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+#result {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Dropdown list for possible answers */
+#guess-dropdown {
+    display: none;
+    position: absolute;
+    background-color: #202020;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    color: white;
+}
+
+#guess-dropdown button {
+    width: 100%;
+    text-align: left;
+    padding: 10px;
+    border: none;
+    background-color: inherit;
+    color: white;
+    cursor: pointer;
+}
+
+#guess-dropdown button:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+/* Media queries for responsiveness */
+@media (min-width: 768px) {
+    .navbar {
+        flex-direction: row;
+    }
+
+    .navbar form {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .content {
+        flex-direction: row;
+        padding: 40px;
+    }
+
+    .left-column {
+        width: 15%;
+        margin-bottom: 0;
+    }
+
+    .middle-column {
+        width: 85%;
+        margin-bottom: 0;
+        text-align: center;
+    }
+
+    .right-column {
+        width: 15%;
+        margin-bottom: 0;
+    }
+
+    .left-column {
+        padding-right: 20px;
+    }
+
+    .middle-column {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .right-column {
+        padding-left: 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+    }
+}

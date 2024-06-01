@@ -118,7 +118,6 @@ def set_session_variables():
     session["logged_in"] = False
     session["score"] = 0
     session["username"] = ""
-
     return
 
 
@@ -127,10 +126,14 @@ def render_game():
     flags = Flag.query.all()
     countries = [flag.country for flag in flags]
     flag = random.choice(flags)
-    flag_data = {"img_path": flag.img_path, "country": flag.country}
+    flag_data = {"img_path": "/flag_images/"+flag.img_path, "country": flag.country}
 
-    # Retrieve highest 5 high scores
-    highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(5).all()
+    highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(15).all()
+
+    default_highscore = Highscore(score=0, user="N/A")
+
+    while len(highest_scores) < 15:
+        highest_scores.append(default_highscore)
 
     # Retrieve user's high score if logged in
     user_highscore = None

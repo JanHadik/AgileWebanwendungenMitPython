@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flagstravaganza</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_desktop.css') }}"
+          media="screen and (min-width: 768px)">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_mobile.css') }}"
+          media="screen and (max-width: 767px)">
 </head>
 <body>
 <div class="navbar">
@@ -28,23 +32,15 @@
 <div class="content">
     <div class="left-column">
         <div class="high-scores">
-            <h2>High Scores</h2>
+            <h2>Global Rankings</h2>
             <ol>
                 {% for score in highest_scores %}
                     <li>{{ score.user }}: {{ score.score }}</li>
                 {% endfor %}
             </ol>
-            {% if logged_in %}
-                <h2>Your High Score:</h2>
-                {% if user_highscore %}
-                    <p>{{ user_highscore.score }}</p>
-                {% else %}
-                    <p>No high score yet</p>
-                {% endif %}
-            {% endif %}
         </div>
     </div>
-    <div class="right-column">
+    <div class="middle-column">
         <div class="flag-guess">
             <h1>Guess the Flag</h1>
             <img id="flag-image" src="{{ url_for('static', filename=flag['img_path']) }}" alt="Flag"
@@ -58,6 +54,20 @@
             <!-- Dropdown list for possible answers -->
             <div id="guess-dropdown"></div>
             <p id="result"></p>
+        </div>
+    </div>
+    <div class="right-column">
+        <div class="high-scores">
+            <h2>Current Score</h2>
+            <p>0</p>
+            {% if logged_in %}
+                <h2>Your High Score</h2>
+                {% if user_highscore %}
+                    <p>{{ user_highscore.score }}</p>
+                {% else %}
+                    <p>No high score yet</p>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
 </div>
