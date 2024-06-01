@@ -62,7 +62,7 @@ body {
     padding: 20px;
 }
 
-.left-column, .right-column {
+.left-column,.middle-column, .right-column {
     width: 100%;
     margin-bottom: 20px;
 }

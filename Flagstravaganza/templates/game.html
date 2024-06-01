@@ -32,14 +32,19 @@
 <div class="content">
     <div class="left-column">
         <div class="high-scores">
-            <h2>Global Rankings</h2>
-            <ol>
-                {% for score in highest_scores %}
-                    <li>{{ score.user }}: {{ score.score }}</li>
-                {% endfor %}
-            </ol>
+            <h2>Current Score</h2>
+            <p>0</p>
+            {% if logged_in %}
+                <h2>Your High Score</h2>
+                {% if user_highscore %}
+                    <p>{{ user_highscore.score }}</p>
+                {% else %}
+                    <p>No high score yet</p>
+                {% endif %}
+            {% endif %}
         </div>
     </div>
+
     <div class="middle-column">
         <div class="flag-guess">
             <h1>Guess the Flag</h1>
@@ -56,18 +61,15 @@
             <p id="result"></p>
         </div>
     </div>
+
     <div class="right-column">
         <div class="high-scores">
-            <h2>Current Score</h2>
-            <p>0</p>
-            {% if logged_in %}
-                <h2>Your High Score</h2>
-                {% if user_highscore %}
-                    <p>{{ user_highscore.score }}</p>
-                {% else %}
-                    <p>No high score yet</p>
-                {% endif %}
-            {% endif %}
+            <h2>Global Rankings</h2>
+            <ol>
+                {% for score in highest_scores %}
+                    <li>{{ score.user }}: {{ score.score }}</li>
+                {% endfor %}
+            </ol>
         </div>
     </div>
 </div>
@@ -132,7 +134,7 @@
             $.post('/check_guess', formData, function (response) {
                 $('#result').text(response.result);
                 if (response.new_flag) {
-                    $('#flag-image').attr('src', '/static/' + response.new_flag.img_path);
+                    $('#flag-image').attr('src', '/static/flag_images/' + response.new_flag.img_path);
                     $('#flag_country').val(response.new_flag.country);
                 }
                 $('#guess').val(''); // Clear the input field
