@@ -5,7 +5,7 @@ import time
 from flask import render_template, request, jsonify, session
 from sqlalchemy import desc
 
-from Flagstravaganza import app, db
+from Flagstravaganza import app, db, socketio
 from Flagstravaganza.models import User, Flag, Highscore
 from config import salt
 
@@ -15,7 +15,6 @@ Session Variables:
 session["score"]
 session["username"]
 session["logged_in"]
-
 session["image"]
 '''
 
@@ -79,6 +78,12 @@ def logout():
     return render_game()
 
 
+@app.route('/current_score')
+def current_score():
+    current_score = session.get('score', 0)
+    return jsonify({'current_score': current_score})
+
+
 @app.route('/check_guess', methods=['POST'])
 def check_guess():
     # Get the guessed country from the form
@@ -91,6 +96,7 @@ def check_guess():
     if guessed_country == flag_country:
         result = "Correct! Here's a new flag."
         session["score"] = session["score"] + 1
+        socketio.emit('update_score', {'current_score': session['score']})
     else:
         if session["logged_in"]:
             curr_highscore = Highscore.query.filter_by(user=session["username"]).first()
@@ -104,13 +110,9 @@ def check_guess():
                 db.session.add(highscore)
                 db.session.commit()
             session["score"] = 0
-        result = "Incorrect! The correct answer was "+flag_country+"."
+        result = "Incorrect! The correct answer was " + flag_country + "."
 
-    flags = Flag.query.all()
-    new_flag = random.choice(flags)
-    new_flag_data = {"img_path": new_flag.img_path, "country": new_flag.country}
-
-    return jsonify(result=result, new_flag=new_flag_data)
+    return jsonify(result=result, new_flag=get_new_flag())
 
 
 def set_session_variables():
@@ -121,21 +123,27 @@ def set_session_variables():
     return
 
 
+def get_new_flag():
+    flags = Flag.query.all()
+    new_flag = random.choice(flags)
+    new_flag_data = {"img_path": new_flag.img_path, "country": new_flag.country}
+    return new_flag_data
+
+
 def render_game():
     # Retrieve all flags and countries from the database
     flags = Flag.query.all()
     countries = [flag.country for flag in flags]
     flag = random.choice(flags)
-    flag_data = {"img_path": "/flag_images/"+flag.img_path, "country": flag.country}
+    flag_data = {"img_path": "/flag_images/" + flag.img_path, "country": flag.country}
 
-    highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(15).all()
+    highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(7).all()
 
     default_highscore = Highscore(score=0, user="N/A")
 
-    while len(highest_scores) < 15:
+    while len(highest_scores) < 7:
         highest_scores.append(default_highscore)
 
-    # Retrieve user's high score if logged in
     user_highscore = None
     if session["logged_in"]:
         user = User.query.filter_by(username=session["username"]).first()

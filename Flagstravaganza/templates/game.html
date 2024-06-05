@@ -33,7 +33,7 @@
     <div class="left-column">
         <div class="high-scores">
             <h2>Current Score</h2>
-            <p>0</p>
+            <p id="current-score">0</p>
             {% if logged_in %}
                 <h2>Your High Score</h2>
                 {% if user_highscore %}
@@ -74,9 +74,16 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
+        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+        socket.on('update_score', function (data) {
+            $('#current-score').text(data.current_score);
+        });
+
         // Array of possible answers
         var possibleAnswers = [
             {% for answer in countries %}
