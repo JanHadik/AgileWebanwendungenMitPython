@@ -89,13 +89,8 @@ def check_guess():
 
     # Check if the guess is correct
     if guessed_country == flag_country:
-        # If correct, pick a new random flag
-        flags = Flag.query.all()
-        new_flag = random.choice(flags)
-        new_flag_data = {"img_path": new_flag.img_path, "country": new_flag.country}
         result = "Correct! Here's a new flag."
         session["score"] = session["score"] + 1
-        return jsonify(result=result, new_flag=new_flag_data)
     else:
         if session["logged_in"]:
             curr_highscore = Highscore.query.filter_by(user=session["username"]).first()
@@ -109,8 +104,13 @@ def check_guess():
                 db.session.add(highscore)
                 db.session.commit()
             session["score"] = 0
-        result = "Incorrect! Try again."
-        return jsonify(result=result)
+        result = "Incorrect! The correct answer was "+flag_country+"."
+
+    flags = Flag.query.all()
+    new_flag = random.choice(flags)
+    new_flag_data = {"img_path": new_flag.img_path, "country": new_flag.country}
+
+    return jsonify(result=result, new_flag=new_flag_data)
 
 
 def set_session_variables():
