@@ -109,7 +109,8 @@ def check_guess():
                 highscore = Highscore(session["username"], session["score"])
                 db.session.add(highscore)
                 db.session.commit()
-            session["score"] = 0
+        session["score"] = 0
+        socketio.emit('update_score', {'current_score': session['score']})
         result = "Incorrect! The correct answer was " + flag_country + "."
 
     return jsonify(result=result, new_flag=get_new_flag())
