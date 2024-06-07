@@ -53,10 +53,8 @@
             <form id="guess-form">
                 <label for="guess">Enter the country:</label>
                 <input type="text" id="guess" name="guess" required autocomplete="off">
-                <input type="hidden" id="flag_country" name="flag_country" value="{{ flag['country'] }}">
                 <button type="submit">Guess</button>
             </form>
-            <!-- Dropdown list for possible answers -->
             <div id="guess-dropdown"></div>
             <p id="result"></p>
         </div>
@@ -141,8 +139,7 @@
             $.post('/check_guess', formData, function (response) {
                 $('#result').text(response.result);
                 if (response.new_flag) {
-                    $('#flag-image').attr('src', '/static/flag_images/' + response.new_flag.img_path);
-                    $('#flag_country').val(response.new_flag.country);
+                    $('#flag-image').attr('src', "static"+response.new_flag.img_path);
                 }
                 $('#guess').val(''); // Clear the input field
             });

@@ -12,6 +12,7 @@ from config import salt
 '''
 Session Variables:
 
+session["current_flag"]
 session["score"]
 session["username"]
 session["logged_in"]
@@ -86,14 +87,11 @@ def current_score():
 
 @app.route('/check_guess', methods=['POST'])
 def check_guess():
-    # Get the guessed country from the form
     guessed_country = request.form['guess'].strip().lower()
 
-    # Get the actual country of the flag
-    flag_country = request.form['flag_country'].strip().lower()
+    flag_country = session["current_flag"]
 
-    # Check if the guess is correct
-    if guessed_country == flag_country:
+    if guessed_country.lower() == flag_country.lower():
         result = "Correct! Here's a new flag."
         session["score"] = session["score"] + 1
         socketio.emit('update_score', {'current_score': session['score']})
@@ -117,26 +115,25 @@ def check_guess():
 
 
 def set_session_variables():
-    # sets the session variables to a default value
     session["logged_in"] = False
     session["score"] = 0
     session["username"] = ""
+    session["current_flag"] = ""
     return
 
 
 def get_new_flag():
     flags = Flag.query.all()
     new_flag = random.choice(flags)
-    new_flag_data = {"img_path": new_flag.img_path, "country": new_flag.country}
+    new_flag_data = {"img_path": "/flag_images/"+new_flag.img_path, "country": new_flag.country}
+    session["current_flag"] = new_flag.country
     return new_flag_data
 
 
 def render_game():
-    # Retrieve all flags and countries from the database
     flags = Flag.query.all()
     countries = [flag.country for flag in flags]
-    flag = random.choice(flags)
-    flag_data = {"img_path": "/flag_images/" + flag.img_path, "country": flag.country}
+    flag_data = get_new_flag()
 
     highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(7).all()
 
