@@ -33,7 +33,7 @@
     <div class="left-column">
         <div class="high-scores">
             <h2>Current Score</h2>
-            <p id="current-score">0</p>
+            <p id="current-score">{{ session['score'] }}</p>
             {% if logged_in %}
                 <h2>Your High Score</h2>
                 {% if user_highscore %}
@@ -50,7 +50,7 @@
             <h1>Guess the Flag</h1>
             <img id="flag-image" src="{{ url_for('static', filename=flag['img_path']) }}" alt="Flag"
                  style="width: 256px; height: auto;">
-            <form id="guess-form">
+            <form action="/check_guess" method="POST" id="guess-form">
                 <label for="guess">Enter the country:</label>
                 <input type="text" id="guess" name="guess" required autocomplete="off">
                 <button type="submit">Guess</button>
@@ -70,14 +70,18 @@
         </div>
     </div>
 
-    <div id="gameover-modal" class="modal">
-        <div class="modal-content">
-            <h2>Game Over</h2>
-            <p>Final Score: user_highscore</p>
-            <button id="retry-button">Retry</button>
+    {% if game_over %}
+        <div id="gameover-modal" class="modal" style="display: block;">
+            <div class="modal-content">
+                <h2>Game Over</h2>
+                <p>Final Score: {{ end_score }}</p>
+                <p>Sorry, that's incorrect. The correct answer was {{ correct_answer }}.</p>
+                <form action="/" method="GET">
+                    <button id="retry-button">Retry</button>
+                </form>
+            </div>
         </div>
-    </div>
-
+    {% endif %}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
@@ -102,9 +106,13 @@
             dropdown.empty();
 
             if (userInput.length > 0) {
-
                 var filteredAnswers = possibleAnswers.filter(function (answer) {
                     return answer.toLowerCase().includes(userInput);
+                });
+
+                // Sort filtered answers by similarity to the user input
+                filteredAnswers.sort(function (a, b) {
+                    return a.indexOf(userInput) - b.indexOf(userInput);
                 });
 
                 filteredAnswers.forEach(function (answer) {
@@ -125,6 +133,14 @@
             updateDropdown();
         });
 
+        $('#guess').on('keydown', function (e) {
+            if (e.keyCode === 9) { // Tab key
+                e.preventDefault(); // Prevent default tab behavior
+                var firstOption = $('#guess-dropdown button').first().text();
+                $('#guess').val(firstOption);
+            }
+        });
+
         $(document).on('click', function (event) {
             if (!$(event.target).closest('#guess-dropdown').length && !$(event.target).is('#guess')) {
                 $('#guess-dropdown').hide();
@@ -137,30 +153,11 @@
         });
 
         $('#guess-form').submit(function (event) {
-            event.preventDefault();
-            var formData = $(this).serialize();
-            $.post('/check_guess', formData, function (response) {
-                $('#result').text(response.result);
-                if (response.game_over) {
-                    $('#gameover-modal p').text("Sorry, that's incorrect. The correct answer was " + response.correct_answer + ".");
-                    $('#gameover-modal').show();
-                }
-                if (response.new_flag) {
-                    $('#flag-image').attr('src', "static" + response.new_flag.img_path);
-                }
-                $('#guess').val('');
-            });
-        });
-
-        var modal = $('#gameover-modal');
-
-        var retryButton = $('#retry-button');
-        retryButton.on('click', function () {
-            modal.hide();
+            $('#guess-dropdown').hide();
         });
     });
-
 </script>
+
 
 </body>
 </html>

@@ -1,10 +1,8 @@
 import hashlib
 import random
 import time
-
 from flask import render_template, request, jsonify, session
 from sqlalchemy import desc
-
 from Flagstravaganza import app, db, socketio
 from Flagstravaganza.models import User, Flag, Highscore
 from config import salt
@@ -12,12 +10,13 @@ from config import salt
 '''
 Session Variables:
 
-session["game_over"]
-session["current_flag"]
-session["score"]
-session["username"]
-session["logged_in"]
-session["image"]
+    session["logged_in"] = False
+    session["game_over"] = False
+    session["score"] = 0
+    session["end_score"] = 0
+    session["username"] = ""
+    session["current_flag"] = ""
+    session["correct_answer"] = ""
 '''
 
 
@@ -88,16 +87,14 @@ def current_score():
 
 @app.route('/check_guess', methods=['POST'])
 def check_guess():
-    guessed_country = request.form['guess'].strip().lower()
+    guessed_country = request.form['guess']
     flag_country = session["current_flag"]
 
     if guessed_country.lower() == flag_country.lower():
-        result = "Correct! Here's a new flag."
-        session["score"] = session["score"] + 1
+        session["score"] += 1
         socketio.emit('update_score', {'current_score': session['score']})
         session["game_over"] = False
     else:
-        session["game_over"] = True
         if session["logged_in"]:
             curr_highscore = Highscore.query.filter_by(user=session["username"]).first()
             if curr_highscore is None:
@@ -109,28 +106,29 @@ def check_guess():
                 highscore = Highscore(session["username"], session["score"])
                 db.session.add(highscore)
                 db.session.commit()
-        session["score"] = 0
         socketio.emit('update_score', {'current_score': session['score']})
-        result = f"Incorrect! The correct answer was {flag_country}."
-
-    return jsonify(result=result, new_flag=get_new_flag(), game_over=session["game_over"], correct_answer=flag_country)
+        session["end_score"] = session["score"]
+        session["correct_answer"] = session["current_flag"]
+        session["score"] = 0
+        session["game_over"] = True
+    return render_game()
 
 
 def set_session_variables():
     session["logged_in"] = False
+    session["game_over"] = False
     session["score"] = 0
+    session["end_score"] = 0
     session["username"] = ""
     session["current_flag"] = ""
-    session["game_over"] = False
-    return
+    session["correct_answer"] = ""
 
 
 def get_new_flag():
     flags = Flag.query.all()
     new_flag = random.choice(flags)
-    new_flag_data = {"img_path": "/flag_images/" + new_flag.img_path, "country": new_flag.country}
     session["current_flag"] = new_flag.country
-    return new_flag_data
+    return {"img_path": "/flag_images/" + new_flag.img_path, "country": new_flag.country}
 
 
 def render_game():
@@ -139,7 +137,6 @@ def render_game():
     flag_data = get_new_flag()
 
     highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(7).all()
-
     default_highscore = Highscore(score=0, user="N/A")
 
     while len(highest_scores) < 7:
@@ -153,7 +150,7 @@ def render_game():
 
     return render_template('game.html', flag=flag_data, countries=countries, logged_in=session["logged_in"],
                            highest_scores=highest_scores, user_highscore=user_highscore, username=session["username"],
-                           game_over=session["game_over"])
+                           game_over=session["game_over"], end_score=session["end_score"], correct_answer=session["correct_answer"])
 
 
 if __name__ == '__main__':
