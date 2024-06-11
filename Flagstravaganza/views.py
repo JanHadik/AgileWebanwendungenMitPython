@@ -12,6 +12,7 @@ from config import salt
 '''
 Session Variables:
 
+session["game_over"]
 session["current_flag"]
 session["score"]
 session["username"]
@@ -88,14 +89,15 @@ def current_score():
 @app.route('/check_guess', methods=['POST'])
 def check_guess():
     guessed_country = request.form['guess'].strip().lower()
-
     flag_country = session["current_flag"]
 
     if guessed_country.lower() == flag_country.lower():
         result = "Correct! Here's a new flag."
         session["score"] = session["score"] + 1
         socketio.emit('update_score', {'current_score': session['score']})
+        session["game_over"] = False
     else:
+        session["game_over"] = True
         if session["logged_in"]:
             curr_highscore = Highscore.query.filter_by(user=session["username"]).first()
             if curr_highscore is None:
@@ -109,9 +111,9 @@ def check_guess():
                 db.session.commit()
         session["score"] = 0
         socketio.emit('update_score', {'current_score': session['score']})
-        result = "Incorrect! The correct answer was " + flag_country + "."
+        result = f"Incorrect! The correct answer was {flag_country}."
 
-    return jsonify(result=result, new_flag=get_new_flag())
+    return jsonify(result=result, new_flag=get_new_flag(), game_over=session["game_over"], correct_answer=flag_country)
 
 
 def set_session_variables():
@@ -119,13 +121,14 @@ def set_session_variables():
     session["score"] = 0
     session["username"] = ""
     session["current_flag"] = ""
+    session["game_over"] = False
     return
 
 
 def get_new_flag():
     flags = Flag.query.all()
     new_flag = random.choice(flags)
-    new_flag_data = {"img_path": "/flag_images/"+new_flag.img_path, "country": new_flag.country}
+    new_flag_data = {"img_path": "/flag_images/" + new_flag.img_path, "country": new_flag.country}
     session["current_flag"] = new_flag.country
     return new_flag_data
 
@@ -149,7 +152,8 @@ def render_game():
             user_highscore = Highscore.query.filter_by(user=user.username).first()
 
     return render_template('game.html', flag=flag_data, countries=countries, logged_in=session["logged_in"],
-                           highest_scores=highest_scores, user_highscore=user_highscore, username=session["username"])
+                           highest_scores=highest_scores, user_highscore=user_highscore, username=session["username"],
+                           game_over=session["game_over"])
 
 
 if __name__ == '__main__':

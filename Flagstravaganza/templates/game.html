@@ -56,7 +56,6 @@
                 <button type="submit">Guess</button>
             </form>
             <div id="guess-dropdown"></div>
-            <p id="result"></p>
         </div>
     </div>
 
@@ -70,6 +69,15 @@
             </ol>
         </div>
     </div>
+
+    <div id="gameover-modal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over</h2>
+            <p>Final Score: user_highscore</p>
+            <button id="retry-button">Retry</button>
+        </div>
+    </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
@@ -82,55 +90,50 @@
             $('#current-score').text(data.current_score);
         });
 
-        // Array of possible answers
         var possibleAnswers = [
             {% for answer in countries %}
                 "{{ answer }}"{% if not loop.last %},{% endif %}
             {% endfor %}
         ];
 
-        // Function to display possible answers when input is focused
         function updateDropdown() {
-            var userInput = $('#guess').val().trim().toLowerCase(); // Get user input and convert to lowercase
+            var userInput = $('#guess').val().trim().toLowerCase();
             var dropdown = $('#guess-dropdown');
-            dropdown.empty(); // Clear previous dropdown items
+            dropdown.empty();
 
             if (userInput.length > 0) {
-                // Filter possible answers that include the user input
+
                 var filteredAnswers = possibleAnswers.filter(function (answer) {
                     return answer.toLowerCase().includes(userInput);
                 });
-                // Add each filtered possible answer to the dropdown
+
                 filteredAnswers.forEach(function (answer) {
                     dropdown.append('<button type="button">' + answer + '</button>');
                 });
-                // Show the dropdown below the input field
+
                 dropdown.css({
                     top: $('#guess').offset().top + $('#guess').outerHeight(),
                     left: $('#guess').offset().left,
                     width: $('#guess').outerWidth()
                 }).show();
             } else {
-                dropdown.hide(); // Hide dropdown if input is empty
+                dropdown.hide();
             }
         }
 
-        // Event listener for input focus
         $('#guess').on('input', function () {
             updateDropdown();
         });
 
-        // Hide the dropdown when input loses focus
         $(document).on('click', function (event) {
             if (!$(event.target).closest('#guess-dropdown').length && !$(event.target).is('#guess')) {
                 $('#guess-dropdown').hide();
             }
         });
 
-        // Handle selection of an answer from the dropdown
         $('#guess-dropdown').on('click', 'button', function () {
-            $('#guess').val($(this).text()); // Set input value to the selected answer
-            $('#guess-dropdown').hide(); // Hide the dropdown
+            $('#guess').val($(this).text());
+            $('#guess-dropdown').hide();
         });
 
         $('#guess-form').submit(function (event) {
@@ -138,13 +141,25 @@
             var formData = $(this).serialize();
             $.post('/check_guess', formData, function (response) {
                 $('#result').text(response.result);
-                if (response.new_flag) {
-                    $('#flag-image').attr('src', "static"+response.new_flag.img_path);
+                if (response.game_over) {
+                    $('#gameover-modal p').text("Sorry, that's incorrect. The correct answer was " + response.correct_answer + ".");
+                    $('#gameover-modal').show();
                 }
-                $('#guess').val(''); // Clear the input field
+                if (response.new_flag) {
+                    $('#flag-image').attr('src', "static" + response.new_flag.img_path);
+                }
+                $('#guess').val('');
             });
         });
+
+        var modal = $('#gameover-modal');
+
+        var retryButton = $('#retry-button');
+        retryButton.on('click', function () {
+            modal.hide();
+        });
     });
+
 </script>
 
 </body>
