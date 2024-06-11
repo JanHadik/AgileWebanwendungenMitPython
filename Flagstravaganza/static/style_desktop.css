@@ -289,3 +289,12 @@ button[type="submit"]:hover {
 #retry-button:hover {
     background-color: #45a049;
 }
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+html {
+    scrollbar-width: none;
+}

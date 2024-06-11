@@ -26,6 +26,12 @@ def index():
     return render_game()
 
 
+@app.route('/lost')
+def lost():
+    session["game_over"] = False
+    return render_game()
+
+
 @app.route('/register_page', methods=['POST'])
 def register_page():
     return render_template('register_form.html')
@@ -150,7 +156,8 @@ def render_game():
 
     return render_template('game.html', flag=flag_data, countries=countries, logged_in=session["logged_in"],
                            highest_scores=highest_scores, user_highscore=user_highscore, username=session["username"],
-                           game_over=session["game_over"], end_score=session["end_score"], correct_answer=session["correct_answer"])
+                           game_over=session["game_over"], end_score=session["end_score"],
+                           correct_answer=session["correct_answer"])
 
 
 if __name__ == '__main__':

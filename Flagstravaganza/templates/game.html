@@ -52,7 +52,7 @@
                  style="width: 256px; height: auto;">
             <form action="/check_guess" method="POST" id="guess-form">
                 <label for="guess">Enter the country:</label>
-                <input type="text" id="guess" name="guess" required autocomplete="off">
+                <input type="text" id="guess" name="guess" required autocomplete="off" autofocus>
                 <button type="submit">Guess</button>
             </form>
             <div id="guess-dropdown"></div>
@@ -76,7 +76,7 @@
                 <h2>Game Over</h2>
                 <p>Final Score: {{ end_score }}</p>
                 <p>Sorry, that's incorrect. The correct answer was {{ correct_answer }}.</p>
-                <form action="/" method="GET">
+                <form action="/lost" method="GET">
                     <button id="retry-button">Retry</button>
                 </form>
             </div>
@@ -110,7 +110,6 @@
                     return answer.toLowerCase().includes(userInput);
                 });
 
-                // Sort filtered answers by similarity to the user input
                 filteredAnswers.sort(function (a, b) {
                     return a.indexOf(userInput) - b.indexOf(userInput);
                 });
@@ -134,8 +133,8 @@
         });
 
         $('#guess').on('keydown', function (e) {
-            if (e.keyCode === 9) { // Tab key
-                e.preventDefault(); // Prevent default tab behavior
+            if (e.keyCode === 9) {
+                e.preventDefault();
                 var firstOption = $('#guess-dropdown button').first().text();
                 $('#guess').val(firstOption);
             }
@@ -153,7 +152,10 @@
         });
 
         $('#guess-form').submit(function (event) {
-            $('#guess-dropdown').hide();
+            if ($('#guess-dropdown button').length === 1) {
+                $('#guess').val($('#guess-dropdown button').text());
+                $('#guess-dropdown').hide();
+            }
         });
     });
 </script>
