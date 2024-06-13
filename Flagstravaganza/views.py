@@ -121,13 +121,14 @@ def check_guess():
 
 
 def set_session_variables():
-    session["logged_in"] = False
-    session["game_over"] = False
-    session["score"] = 0
-    session["end_score"] = 0
-    session["username"] = ""
-    session["current_flag"] = ""
-    session["correct_answer"] = ""
+    if session["logged_in"] is not True:
+        session["logged_in"] = False
+        session["game_over"] = False
+        session["score"] = 0
+        session["end_score"] = 0
+        session["username"] = ""
+        session["current_flag"] = ""
+        session["correct_answer"] = ""
 
 
 def get_new_flag():

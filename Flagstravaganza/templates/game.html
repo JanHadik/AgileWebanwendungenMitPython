@@ -156,7 +156,7 @@
         });
 
         $('#guess-form').on('submit', function (event) {
-            var inputValue = $('#guess-dropdown button').first().text();
+            var inputValue = $('#guess').val();
             $('#guess').val(inputValue);
             if (!isFromDropdown && !possibleAnswers.includes(inputValue)) {
                 validInput = false;
