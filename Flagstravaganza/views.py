@@ -121,7 +121,7 @@ def check_guess():
 
 
 def set_session_variables():
-    if session["logged_in"] is not True:
+    if session.get("logged_in") is not True:
         session["logged_in"] = False
         session["game_over"] = False
         session["score"] = 0
