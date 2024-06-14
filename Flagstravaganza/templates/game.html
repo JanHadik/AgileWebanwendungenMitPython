@@ -52,7 +52,11 @@
                  style="width: 256px; height: auto;">
             <form action="/check_guess" method="POST" id="guess-form">
                 <label for="guess">Enter the country:</label>
-                <input type="text" id="guess" name="guess" required autocomplete="off" autofocus>
+                {% if game_over %}
+                    <input type="text" id="guess" name="guess" required autocomplete="off">
+                {% else %}
+                    <input type="text" id="guess" name="guess" required autocomplete="off" autofocus>
+                {% endif %}
                 <button type="submit">Guess</button>
             </form>
             <div id="guess-dropdown"></div>
@@ -77,7 +81,7 @@
                 <p>Final Score: {{ end_score }}</p>
                 <p>Sorry, that's incorrect. The correct answer was {{ correct_answer }}.</p>
                 <form action="/lost" method="GET">
-                    <button id="retry-button">Retry</button>
+                    <button id="retry-button" autofocus>Retry</button>
                 </form>
             </div>
         </div>
@@ -88,7 +92,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
-        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
         var possibleAnswers = [
             {% for answer in countries %}
                 "{{ answer }}"{% if not loop.last %},{% endif %}
@@ -97,6 +100,7 @@
 
         var isFromDropdown = false;
         var validInput = false;
+        var dropdownIndex = -1; // Initialize index for dropdown cycling
 
         function updateDropdown() {
             var userInput = $('#guess').val().trim().toLowerCase();
@@ -104,6 +108,7 @@
             dropdown.empty();
             isFromDropdown = false;
             validInput = false;
+            dropdownIndex = -1; // Reset index when updating dropdown
 
             if (userInput.length > 0) {
                 var filteredAnswers = possibleAnswers.filter(function (answer) {
@@ -133,12 +138,25 @@
         });
 
         $('#guess').on('keydown', function (e) {
-            if (e.keyCode === 9) { // Tab key
+            var dropdownButtons = $('#guess-dropdown button');
+            if (e.shiftKey && e.keyCode === 9) { // Shift + Tab key
                 e.preventDefault();
-                var firstOption = $('#guess-dropdown button').first().text();
-                $('#guess').val(firstOption);
-                isFromDropdown = true;
-                validInput = true;
+                if (dropdownButtons.length > 0) {
+                    dropdownIndex = (dropdownIndex - 1 + dropdownButtons.length) % dropdownButtons.length; // Cycle backward through options
+                    var selectedOption = dropdownButtons.eq(dropdownIndex).text();
+                    $('#guess').val(selectedOption);
+                    isFromDropdown = true;
+                    validInput = true;
+                }
+            } else if (e.keyCode === 9) { // Tab key
+                e.preventDefault();
+                if (dropdownButtons.length > 0) {
+                    dropdownIndex = (dropdownIndex + 1) % dropdownButtons.length; // Cycle forward through options
+                    var selectedOption = dropdownButtons.eq(dropdownIndex).text();
+                    $('#guess').val(selectedOption);
+                    isFromDropdown = true;
+                    validInput = true;
+                }
             }
         });
 
@@ -157,8 +175,8 @@
 
         $('#guess-form').on('submit', function (event) {
             var inputValue = $('#guess').val();
-            $('#guess').val(inputValue);
-            if (!isFromDropdown && !possibleAnswers.includes(inputValue)) {
+            if (!isFromDropdown && !possibleAnswers.some(answer => answer.toLowerCase() === inputValue)) {
+                event.preventDefault();
                 validInput = false;
             } else {
                 validInput = true;
@@ -166,12 +184,17 @@
         });
 
         $('#guess').on('keydown', function (e) {
+            var dropdownButtons = $('#guess-dropdown button');
             if (e.keyCode === 13) { // Enter key
-                var inputValue = $('#guess-dropdown button').first().text();
-                $('#guess').val(inputValue);
-                if (possibleAnswers.includes(inputValue)) {
+                if (dropdownButtons.length > 0 && !isFromDropdown) {
+                    e.preventDefault();
+                    var firstOption = dropdownButtons.first().text();
+                    $('#guess').val(firstOption);
                     validInput = true;
-                } else {
+                    isFromDropdown = true;
+                    $('#guess-form').submit();
+                } else if (!isFromDropdown) {
+                    e.preventDefault();
                     validInput = false;
                 }
             }
