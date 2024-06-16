@@ -62,8 +62,6 @@ def register():
         session["username"] = username
         session["score"] = 0
 
-        time.sleep(2.5)
-
         return render_game()
 
 
