@@ -58,6 +58,10 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        session["logged_in"] = True
+        session["username"] = username
+        session["score"] = 0
+
         time.sleep(2.5)
 
         return render_game()
@@ -74,6 +78,7 @@ def login():
     if user:
         session["logged_in"] = True
         session["username"] = username
+        session["score"] = 0
         return render_game()
     else:
         return render_game()
@@ -82,6 +87,7 @@ def login():
 @app.route('/logout', methods=['POST'])
 def logout():
     session["logged_in"] = False
+    session["score"] = 0
     return render_game()
 
 
