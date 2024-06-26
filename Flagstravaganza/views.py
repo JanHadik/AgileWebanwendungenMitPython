@@ -1,7 +1,7 @@
 import hashlib
 import random
 import time
-from flask import render_template, request, jsonify, session
+from flask import render_template, request, jsonify, session, send_file
 from sqlalchemy import desc
 from Flagstravaganza import app, db, socketio
 from Flagstravaganza.models import User, Flag, Highscore
@@ -24,6 +24,16 @@ Session Variables:
 def index():
     set_session_variables()
     return render_game()
+
+
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_file('manifest.json', mimetype='application/manifest+json')
+
+
+@app.route('/sw.js')
+def serve_sw():
+    return send_file('sw.js', mimetype='application/javascript')
 
 
 @app.route('/lost')

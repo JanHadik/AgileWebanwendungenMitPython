@@ -1,0 +1,29 @@
+{
+  "name": "Flagstravaganza",
+  "short_name": "Flagstravaganza",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#317EFB",
+  "background_color": "#317EFB",
+  "icons": [
+    {
+      "src": "/static/icon_256_256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/screenshot1.png",
+      "sizes": "425x927",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/screenshot2.png",
+      "sizes": "1919x1079",
+      "type": "image/png"
+    }
+  ]
+}
