@@ -7,18 +7,6 @@ from Flagstravaganza import app, db, socketio
 from Flagstravaganza.models import User, Flag, Highscore
 from config import salt
 
-'''
-Session Variables:
-
-    session["logged_in"] = False
-    session["game_over"] = False
-    session["score"] = 0
-    session["end_score"] = 0
-    session["username"] = ""
-    session["current_flag"] = ""
-    session["correct_answer"] = ""
-'''
-
 
 @app.route('/')
 def index():
@@ -160,7 +148,7 @@ def render_game():
     highest_scores = Highscore.query.order_by(desc(Highscore.score)).limit(7).all()
     default_highscore = Highscore(score=0, user="N/A")
 
-    while len(highest_scores) < 7:
+    while len(highest_scores) < 1:
         highest_scores.append(default_highscore)
 
     user_highscore = None
