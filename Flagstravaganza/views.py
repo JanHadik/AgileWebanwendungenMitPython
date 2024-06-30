@@ -1,6 +1,5 @@
 import hashlib
 import random
-import time
 from flask import render_template, request, jsonify, session, send_file
 from sqlalchemy import desc
 from Flagstravaganza import app, db, socketio

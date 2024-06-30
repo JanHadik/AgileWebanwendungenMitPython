@@ -1,4 +1,3 @@
-/* General styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -8,7 +7,6 @@ body {
     font-size: 16px;
 }
 
-/* Navbar styles */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -56,7 +54,6 @@ body {
     text-decoration: none;
 }
 
-/* Center container for content */
 .center-container {
     display: flex;
     justify-content: center;
@@ -65,7 +62,6 @@ body {
     flex-direction: column;
 }
 
-/* Form container */
 .form-container {
     align-items: center;
     width: 100%;
@@ -84,7 +80,6 @@ body {
     text-align: center;
 }
 
-/* Content styles */
 .content {
     display: flex;
     flex-direction: column;
@@ -116,7 +111,6 @@ li {
     margin-bottom: 5px;
 }
 
-/* Flag image */
 #flag-image {
     display: block;
     margin: 0 auto;
@@ -126,7 +120,6 @@ li {
     max-width: 256px;
 }
 
-/* Guess form */
 #guess-form {
     display: flex;
     flex-direction: column;
@@ -162,7 +155,6 @@ button[type="submit"]:hover {
     font-weight: bold;
 }
 
-/* Dropdown list for possible answers */
 #guess-dropdown {
     display: none;
     position: absolute;
@@ -187,55 +179,6 @@ button[type="submit"]:hover {
     color: black;
 }
 
-/* Media queries for responsiveness */
-@media (min-width: 768px) {
-    .navbar {
-        flex-direction: row;
-    }
-
-    .navbar form {
-        flex-direction: row;
-        align-items: center;
-    }
-
-    .content {
-        flex-direction: row;
-        padding: 40px;
-    }
-
-    .left-column {
-        width: 15%;
-        margin-bottom: 0;
-    }
-
-    .middle-column {
-        width: 85%;
-        margin-bottom: 0;
-        text-align: center;
-    }
-
-    .right-column {
-        width: 15%;
-        margin-bottom: 0;
-    }
-
-    .left-column {
-        padding-right: 20px;
-    }
-
-    .middle-column {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-
-    .right-column {
-        padding-left: 20px;
-    }
-
-    .form-container {
-        max-width: 600px;
-    }
-}
 
 .modal {
     display: none;
@@ -297,4 +240,54 @@ button[type="submit"]:hover {
 
 html {
     scrollbar-width: none;
+}
+
+/* Media queries for responsiveness */
+@media (min-width: 768px) {
+    .navbar {
+        flex-direction: row;
+    }
+
+    .navbar form {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .content {
+        flex-direction: row;
+        padding: 40px;
+    }
+
+    .left-column {
+        width: 15%;
+        margin-bottom: 0;
+    }
+
+    .middle-column {
+        width: 85%;
+        margin-bottom: 0;
+        text-align: center;
+    }
+
+    .right-column {
+        width: 15%;
+        margin-bottom: 0;
+    }
+
+    .left-column {
+        padding-right: 20px;
+    }
+
+    .middle-column {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .right-column {
+        padding-left: 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+    }
 }
